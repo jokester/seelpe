@@ -1,21 +1,14 @@
-h1. seelpe
-
+**seelpe**
 seelpe is a ruby module to solve constraint problems on finite domain
 
-h2. example
+*example*
 
 to build a Constraint, you can either
 * build a instance by list of arguments, and a proc
-@d = Constraint.new :v1,:v2 {|v1,v2| v1+v2==5}@
-@d.solved_by?( v1:1, v2:4) # => true @
-@d.solved_by?( v1:2, v2:3) # => false @
+    d = Constraint.new :v1,:v2 {|v1,v2| v1+v2==5}
 * build a class by Constraint.subclass or not(Subclass), and then cast Subclass.new with different argument lists
-@EQ = Constraint.subclass {|a,b| a == b }@
-@EQ.new(:a,:b).solved_by?( a:1, b:1 )  # => true @
+    EQ = Constraint.subclass {|a,b| a == b }
+    e = EQ.new(:a,:b)
 * build a constraint from arithmatic expression
-
 using eval to do this. DO NOT use on web server or somewhere dangerous
-@c = Constraint.parse "a1+a2 < 5"@
-@c.solved_by?( a1:1, a2:2)   # =>  true@
-@c.solved_by?( a2:5, a1:0)   # => false@
-
+    f = Constraint.parse "a1+a2 < 5"
