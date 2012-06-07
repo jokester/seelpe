@@ -13,7 +13,7 @@ build a subclass by Constraint.subclass, and then cast Subclass.new with argumen
     EQ = Constraint.subclass {|a,b| a == b }
     e = EQ.new(:a,:b)
 
-build a constraint from arithmatic expression # eval involved, DO NOT use on web server or somewhere dangerous
+build a constraint from arithmatic expression # eval involved, *DO NOT* use on web server or somewhere dangerous
 
     f = Constraint.parse "a1+a2 < 5"
 
