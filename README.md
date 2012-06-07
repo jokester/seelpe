@@ -8,13 +8,13 @@ build a instance by list of arguments, and a proc
 
     d = Constraint.new :v1,:v2 {|v1,v2| v1+v2==5}
 
-build a class by Constraint.subclass or not(Subclass), and then cast Subclass.new with different argument lists
+build a subclass by Constraint.subclass, and then cast Subclass.new with argument lists
 
     EQ = Constraint.subclass {|a,b| a == b }
     e = EQ.new(:a,:b)
 
-build a constraint from arithmatic expression
-
-###### we are using eval to do this. DO NOT use on web server or somewhere dangerous
+build a constraint from arithmatic expression # eval involved, DO NOT use on web server or somewhere dangerous
 
     f = Constraint.parse "a1+a2 < 5"
+
+
