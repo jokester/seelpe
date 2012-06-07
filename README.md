@@ -2,7 +2,7 @@
 seelpe is a ruby module to solve constraint problems on finite domain
 
 ## Example
-    to build a Constraint, you can either
+to build a Constraint, you can either
 
 * build a instance by list of arguments, and a proc
 
@@ -13,6 +13,6 @@ seelpe is a ruby module to solve constraint problems on finite domain
     e = EQ.new(:a,:b)
 * build a constraint from arithmatic expression
 
-using eval to do this. DO NOT use on web server or somewhere dangerous
+### we are using eval to do this. DO NOT use on web server or somewhere dangerous
 
     f = Constraint.parse "a1+a2 < 5"
