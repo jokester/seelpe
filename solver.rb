@@ -102,17 +102,24 @@ module Seelpe
       # binding : { var => domain }
       # domain has to be Enumerable
       s = solve_recursive Hash.new
-      case s
-      when true
-        print "solveable\n"
-      else
-        print "not solveable\n"
-      end
     end
 
     def solve_recursive values
       full,notfull = @constraints.partition{|c| c.free_variables(values).size == 0}
-      true
+      if full.any?{|c| c.solved_by?(values) != true}
+        false
+      elsif notfull.size==0
+        true
+      else
+        notfull.sort_by! {|c| c.free_variables(values).size }
+        var_next = notfull.first.free_variables(values).first
+        domain = @domain[ var_next ]
+        values_in_subgoal = values.dup
+        domain.any? do |value|
+          values_in_subgoal[ var_next ] = value
+          solve_recursive values_in_subgoal
+        end
+      end
     end
 
     def unrestricted_variable
