@@ -10,18 +10,6 @@ module ConstraintSolver
     end
     attr_reader :vars
 
-    def self.parse string
-      variable_list = string.scan(VARIABLE_NAME).map(&:to_sym).uniq
-      blk = proc do |*args|
-        expression = string.dup
-        variable_list.each_with_index do |arg,index|
-          expression.gsub!(arg.to_s,args[index].to_s)
-        end
-        eval expression
-      end
-      self.new *variable_list, &blk
-    end
-
     def free_variables values
       @vars - values.keys
     end
@@ -56,6 +44,19 @@ module ConstraintSolver
         end
       end
     end
+
+    def self.parse string
+      variable_list = string.scan(VARIABLE_NAME).map(&:to_sym).uniq
+      blk = proc do |*args|
+        expression = string.dup
+        variable_list.each_with_index do |arg,index|
+          expression.gsub!(arg.to_s,args[index].to_s)
+        end
+        eval expression
+      end
+      self.new *variable_list, &blk
+    end
+
   end
 
   EQ = Constraint.subclass {|a,b| a == b }
