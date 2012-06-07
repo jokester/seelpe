@@ -121,3 +121,17 @@ describe ConstraintSet do
   end
 end
 
+#describe ConstraintSet do
+#  before do
+#    # a proc for n-order 
+#    @orthogonal_latin_square = ->(order) do |order|
+#      a = ConstraintSet.new
+#      b = ConstraintSet.new
+#
+#      rows=Array 1..order
+#      cols=Array 1..order
+#
+#      rows.product(cols).each do |row,col|           end
+#
+#
+#    end
