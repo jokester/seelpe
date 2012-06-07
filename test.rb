@@ -1,7 +1,7 @@
 require_relative 'solver'
 require 'minitest/autorun'
 
-include ConstraintSolver
+include Seelpe
 
 describe EQ do
   before do

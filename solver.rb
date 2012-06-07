@@ -1,4 +1,4 @@
-module ConstraintSolver
+module Seelpe
   class Constraint
     VARIABLE_NAME = %r![a-zA-Z_][a-zA-Z_0-9]*!
     def initialize *vars, &block # block will be evaulated with substituted variables
@@ -84,9 +84,8 @@ module ConstraintSolver
       else
         raise ArgumentError "Constraint or expression expected"
       end
-      self
+      self # enable chaining
     end
-
     alias :<< :add_constraint
 
     def vars
@@ -96,14 +95,6 @@ module ConstraintSolver
     def def_domain(var,domain)
       raise ArgumentError "Enumberable domain expected" unless domain.is_a? Enumerable
       @domain[var] = domain
-    end
-
-    def unrestricted_variable
-      vars - @domain.keys
-    end
-
-    def domain_sufficent?
-      unrestricted_variable.size == 0
     end
 
     def solveable?
@@ -119,12 +110,18 @@ module ConstraintSolver
       end
     end
 
-    private
     def solve_recursive values
-      constraints_ordered = @constraints.group_by{|c| c.free_variables(values).size = 0}
-      p constraints_ordered
+      full,notfull = @constraints.partition{|c| c.free_variables(values).size == 0}
       true
     end
-  end
 
-end
+    def unrestricted_variable
+      vars - @domain.keys
+    end
+
+    def domain_sufficent?
+      unrestricted_variable.size == 0
+    end
+
+  end # class ConstraintSet
+end # module 
