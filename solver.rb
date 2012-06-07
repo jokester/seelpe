@@ -5,7 +5,7 @@ module Seelpe
       raise ArgumentError,"array of variable names is required"unless vars.is_a? Array
       raise ArgumentError,"block is expected" unless block_given?
       raise ArgumentError,"invalid variable name" unless vars.all?{|var| var =~ VARIABLE_NAME}
-      @vars = vars.freeze
+      @vars = vars.map(&:to_sym).freeze
       @proc = block.freeze
     end
     attr_reader :vars
@@ -93,14 +93,14 @@ module Seelpe
     end
 
     def def_domain(var,domain)
+      # binding : { var => domain }
+      # domain has to be Enumerable
       raise ArgumentError "Enumberable domain expected" unless domain.is_a? Enumerable
       @domain[var] = domain
     end
 
     def solveable?
       raise "domain not defined for #{unrestricted_variable.join','}" unless domain_sufficent?
-      # binding : { var => domain }
-      # domain has to be Enumerable
       s = solve_recursive Hash.new
     end
 
