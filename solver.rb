@@ -10,16 +10,16 @@ module Seelpe
     end
     attr_reader :vars
 
-    def free_variables values
+    def not_valuated values
       @vars - values.keys
     end
 
-    def full? values
-      free_variables(values).size==0
+    def all_valuated? values
+      not_valuated(values).size==0
     end
 
-    def solved_by? values
-      fv = free_variables values
+    def satisfiable? values
+      fv = not_valuated values
       raise "uninstancialized variables: #{fv.join','}" unless fv.size==0
       substitute(values)
     end
@@ -82,7 +82,7 @@ module Seelpe
       when String
         @constraints << Constraint.parse(new_constraint)
       else
-        raise ArgumentError "Constraint or expression expected"
+        raise ArgumentError "Constraint or String expected"
       end
       self # enable chaining
     end
@@ -99,26 +99,30 @@ module Seelpe
       @domain[var] = domain
     end
 
-    def solveable?
+    def satisfiable?
       raise "domain not defined for #{unrestricted_variable.join','}" unless domain_sufficent?
-      s = solve_recursive Hash.new
+      backtrace_solve Hash.new,@constraints
     end
 
-    def solve_recursive values
-      full,notfull = @constraints.partition{|c| c.free_variables(values).size == 0}
-      if full.any?{|c| c.solved_by?(values) != true}
-        false
-      elsif notfull.size==0
-        true
+    def partial_satisfiable? values
+      if @constraints.any?{|c| true != c.satisfiable?(values)}
+        return false
       else
-        notfull.sort_by! {|c| c.free_variables(values).size }
-        var_next = notfull.first.free_variables(values).first
-        domain = @domain[ var_next ]
-        values_in_subgoal = values.dup
-        domain.any? do |value|
-          values_in_subgoal[ var_next ] = value
-          solve_recursive values_in_subgoal
-        end
+        return true
+      end
+    end
+
+    def back_solve values,constraints
+      vars = constraints.reduce([]) {|a,c| a.concat c.not_valuated(values)}
+      return partial_satisfiable? values if vars.size==0
+
+      x = vars.first
+      #TODO optimize selection of x 
+      
+      @domain[x].any? do |val_for_x|
+        val_new = values.dup
+        val_new[x]=val_fox_x
+        partial_satisfiable?(val_new) and back_solve(val_new)
       end
     end
 

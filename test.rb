@@ -9,15 +9,15 @@ describe EQ do
   end
 
   it "succeeds when equal" do
-    @eq.solved_by?( arg1:1, arg2:1 ).must_equal true
+    @eq.satisfiable?( arg1:1, arg2:1 ).must_equal true
   end
 
   it "fails when inequal" do
-    @eq.solved_by?( arg1:5, arg2:3 ).must_equal false
+    @eq.satisfiable?( arg1:5, arg2:3 ).must_equal false
   end
 
   it "should throw exception" do
-    proc{@eq.solved_by?( arg2:100)}.must_raise(RuntimeError)
+    proc{@eq.satisfiable?( arg2:100)}.must_raise(RuntimeError)
   end
 end
 
@@ -27,15 +27,15 @@ describe NE do
   end
 
   it "succeeds when inequal" do
-    @c.solved_by?( arg1:2, arg2:1 ).must_equal true
+    @c.satisfiable?( arg1:2, arg2:1 ).must_equal true
   end
 
   it "fails when equal" do
-    @c.solved_by?( arg1:3, arg2:3 ).must_equal false
+    @c.satisfiable?( arg1:3, arg2:3 ).must_equal false
   end
 
   it "should throw exception" do
-    proc{@c.solved_by?( arg3:100)}.must_raise(RuntimeError)
+    proc{@c.satisfiable?( arg3:100)}.must_raise(RuntimeError)
   end
 end
 
@@ -45,15 +45,15 @@ describe ALL_DISTINCT do
   end
 
   it "succeeds when all distinct" do
-    @c.solved_by?( a:1, b:2, c:5 ).must_equal true
+    @c.satisfiable?( a:1, b:2, c:5 ).must_equal true
   end
 
   it "fails when some of them duplicate" do
-    @c.solved_by?( a:1, b:1, c:2).must_equal false
+    @c.satisfiable?( a:1, b:1, c:2).must_equal false
   end
 
   it "should throw exception" do
-    proc{@c.solved_by?( arg2:5) }.must_raise RuntimeError
+    proc{@c.satisfiable?( arg2:5) }.must_raise RuntimeError
   end
 end
 
@@ -63,19 +63,19 @@ describe Constraint do
   end
 
   it "should be right" do
-    @c.solved_by?( a1:1, a2:2).must_equal true
+    @c.satisfiable?( a1:1, a2:2).must_equal true
   end
 
   it "should be false" do
-    @c.solved_by?( a2:5, a1:0).must_equal false
+    @c.satisfiable?( a2:5, a1:0).must_equal false
   end
 
   it "should still be right" do
-    @c.solved_by?( a1:1, a2:2).must_equal true
+    @c.satisfiable?( a1:1, a2:2).must_equal true
   end
 
   it "should throw exception" do
-    proc{@c.solved_by?(a1:5) }.must_raise RuntimeError
+    proc{@c.satisfiable?(a1:5) }.must_raise RuntimeError
   end
 end
 
@@ -85,11 +85,11 @@ describe Constraint do
   end
 
   it "should be right" do
-    @d.solved_by?( v1:1, v2:4).must_equal true
+    @d.satisfiable?( v1:1, v2:4).must_equal true
   end
 
   it "should be false" do
-    @d.solved_by?( v2:2, v1:2).must_equal false
+    @d.satisfiable?( v2:2, v1:2).must_equal false
   end
 end
 
@@ -117,7 +117,7 @@ describe ConstraintSet do
     @set.def_domain(:a2, 1..5)
     @set.def_domain(:a3, 1..5)
     @set.def_domain(:a4, 1..5)
-    proc{@set.solveable? }.must_raise(RuntimeError)
+    proc{@set.satisfiable? }.must_raise(RuntimeError)
   end
 end
 
