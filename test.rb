@@ -66,15 +66,35 @@ describe Constraint do
     it "is still true when x=-1 and y=3 are separately substituted in another order" do
       @x_plus_y_eq_2.substitute(y:3).substitute(x:-1).eval.must_equal true
     end
-
   end
+
+  describe "domain checking for uniary constraint" do
+    before do
+      @x_is_2 = Constraint.parse "x==2"
+    end
+
+    it "can be satisfied with x in 1..3" do
+      @x_is_2.satisfiable?(x:1..3).must_equal true
+    end
+
+    it "cannot be satisfied with x in [1,3,5]" do
+      @x_is_2.satisfiable?(x:[1,3,5]).must_equal false
+    end
+  end
+
+  describe "domain checking for binary constraint" do
+    before do
+      @x_is_opposite_to_y = Constraint.parse "x == -y"
+    end
+
+    it "can be satisfied with propriate domain" do
+      @x_is_opposite_to_y.satisfiable?( x:-5..-1, y: 3..6 ).must_equal true
+    end
+
+    it "cannot be satisfied with inpropriate domain" do
+      @x_is_opposite_to_y.satisfiable?( x:-5..-1, y: -2..0 ).must_equal false
+    end
+  end
+
 end
 
-describe ALL_DISTINCT do
-
-
-
-
-
-
-end

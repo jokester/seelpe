@@ -1,4 +1,3 @@
-
 module Seelpe
   class Constraint
     VARIABLE_NAME = %r![a-zA-Z_][a-zA-Z_0-9]*!
@@ -22,6 +21,18 @@ module Seelpe
     def eval
       raise "all variable have to be substituted before eval" unless vars.size==0
       @proc[]
+    end
+
+    def satisfiable? domain
+      # return true when a solution can be found on domain
+      if @vars.size==0
+        self.eval
+      else
+        var = @vars.first
+        domain[var].any? do |val|
+          substitute( var => val ).satisfiable? domain
+        end
+      end
     end
 
     def substitute hash
