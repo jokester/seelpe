@@ -11,39 +11,33 @@ module Seelpe
     end
     attr_reader :vars
 
-    def not_valuated values
-      @vars - values.keys
-    end
-
-    def all_valuated? values
-      not_valuated(values).size==0
-    end
-
-    def satisfiable? values
-      fv = not_valuated values
-      if fv.size==0
-        substitute(values)
-      else
-        false
-      end
-
-      #raise "uninstancialized variables: #{fv.join','}" unless fv.size==0
-    end
-
-    def substitute values
-      args=@vars.map{|var| values[var] }
-      @proc.call(*args)
-    end
-
-    def node_consistency? domains
+    def node_consistency? domains={}
       return true if vars.size != 1
-      var=vars.first
+      var=@vars.first
       domain=domains[var]
-      return true if domain.all? do |value|
-        satisfiable?( var => value )
-      end
-
+      return true if domain.all? {|value| satisfiable?(var => value) }
       return false
+    end
+
+    def eval
+      raise "all variable have to be substituted before eval" unless vars.size==0
+      @proc[]
+    end
+
+    def substitute hash
+      oldp=@proc
+      all_vars=@vars
+      newp=proc do |*args|
+        values = all_vars.map do |var|
+          if hash.has_key? var
+            hash[var]
+          else
+            args.shift
+          end
+        end
+        oldp.call(*values)
+      end
+      new_constraint = self.class.new(*(self.vars - hash.keys),&newp)
     end
 
     def self.subclass &block # class method for a subclass
@@ -73,7 +67,6 @@ module Seelpe
       end
       self.new *variable_list, &blk
     end
-
   end
 
   EQ = Constraint.subclass {|a,b| a == b }
