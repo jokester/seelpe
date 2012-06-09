@@ -29,6 +29,23 @@ describe Constraint do
     end
   end
 
+  describe "example in README.md" do
+    it "is real what we showed in README.md" do
+      a = Constraint.parse "x1 < x2"
+      a.vars.must_equal [:x1,:x2] 
+
+      b = a.substitute( x1: 5 )
+      b.vars.must_equal [:x2]
+
+      c = b.substitute( x2: 6 )
+      c.vars.must_equal [] 
+      c.eval.must_equal true
+
+      d = a.substitute( x1:5, x2:3 )
+      d.eval.must_equal false
+    end
+  end
+
   describe "binary constraint" do
     before do
       @x_plus_y_eq_2 = Constraint.parse(' x+y==2')
