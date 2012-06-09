@@ -98,3 +98,20 @@ describe Constraint do
 
 end
 
+describe ConstraintSet do
+  it "can reduce domains for domains" do
+    s = Seelpe::ConstraintSet.new
+    s << "x>0" << "y>0" << "x+y<5"
+    s.def_domain( x: -10..10, y: -10..10 )
+
+    #before reducing
+    s.domain[:x].must_equal Array(-10..10)
+    s.domain[:y].must_equal Array(-10..10)
+
+    s.reduce_domain
+
+    #after reducing
+    s.domain[:x].sort.must_equal [1,2,3]
+    s.domain[:y].sort.must_equal [1,2,3]
+  end
+end
