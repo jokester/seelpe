@@ -1,7 +1,7 @@
 # seelpe
 seelpe is a ruby module to solve constraint problems on finite domain
 
-## Example
+# Example
 ### To build a constraint, one can either
 
 * build a instance by list of arguments, and a proc
