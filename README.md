@@ -81,13 +81,10 @@ seelpe is a ruby module to solve constraint problems on finite domain
         #   once was [8, 10]
         # D(y) has been reduced to [6]
         #   once was [6, 8]
-
-	print s.satisfiable?,"\n"
+	print s.satisfiable?
         # => true
-
         s.def_domain(:x => 0..5,
                      :y => 0..3)
-        
-        print s.satisfiable?,"\n"
+        print s.satisfiable?
         # => false
 
