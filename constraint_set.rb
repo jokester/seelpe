@@ -5,17 +5,9 @@ module Seelpe
       @constraints=[]
       @domain={}
       @indent=0
-      @logger=logger
     end
 
     attr_reader :domain
-
-    def log string
-      if @logger
-        @logger.print(string.chomp)
-        @logger.print("\n")
-      end
-    end
 
     def add_constraint new_constraint
       case new_constraint
@@ -26,7 +18,7 @@ module Seelpe
       else
         raise ArgumentError "Constraint or String expected"
       end
-      self # enable chaining
+      self # enable method chaining
     end
     alias :<< :add_constraint
 
@@ -37,7 +29,7 @@ module Seelpe
     def def_domain(domain_hash)
       # binding : { var => domain }
       # var can be either String or Symbol
-      # domain has to be Enumerable
+      # domain must be Enumerable
       raise ArgumentError "Enumberable domain expected" unless domain_hash.values.all?{|d| d.is_a? Enumerable}
       domain_hash.each do |var, domain|
         @domain[var.to_sym] = Array(domain)
@@ -49,30 +41,22 @@ module Seelpe
       back_solve Hash.new,@constraints
     end
 
-    def reduce_domain
+    def reduce_domain &logger
       # reduce domain for each constraint, until all of them are partial_solvable
       @constraints.sort_by! {|c| c.vars.size }
       still_changing=true
       iterated_times =0
+      logger||=proc {}
       while still_changing==true
-        log(pp_space_size)
         iterated_times += 1
-        still_changing=false
-        still_changing=@constraints.map{|c| reduce_domain_by c}.reduce(false,:|)
-        #new_domains = @constraints.map{|c| reduce_domain_by c}
-        #new_domains.each do |new_domain|
-        #  @domain = @domain.merge(new_domain) do |var,old_domain,new_domain|
-        #    if new_domain.size < old_domain.size
-        #      still_changing=true
-        #      new_domain
-        #    else
-        #      old_domain
-        #    end
-        #  end
-        #end
+        still_changing=@constraints.map{|c| reduce_domain_by c,&logger}.reduce(false,:|)
       end
       size, size_product = space_size
       size_product
+    end
+
+    def satisfiable?
+      0 < reduce_domain
     end
 
     def space_size
@@ -81,18 +65,21 @@ module Seelpe
       return size, size_product
     end
 
-    def pp_space_size
+    def space_size_to_s
       size, size_product = space_size
-      "space size is now #{size.map(&:to_s).join' x '} => #{size_product}"
+      "space size is now #{size.map(&:to_s).join' x '} => #{size_product}\n"
     end
 
-    def reduce_domain_by constraint
+    def reduce_domain_by constraint,&logger
       # return whether domain was reduced by the constraint
+      raise "all domain must be defined before reduce" unless domain_sufficent?
       changed=false
       constraint.vars.each do |var|
+        # reduce D(var), leave only values such that { var => value } is a partial solution
         new_domain = @domain[var].select {|value| constraint.substitute(var=>value).satisfiable? @domain}
         if (new_domain.size < @domain[var].size)
-          log "D(#{var}) reduced to #{new_domain}, once was #{@domain[var]}" 
+          yield "D(#{var}) has been reduced to #{new_domain}\n" if block_given?
+          yield "  once was #{@domain[var]}\n" if block_given?
           @domain[var] = new_domain 
           changed=true
         end
