@@ -114,4 +114,15 @@ describe ConstraintSet do
     s.domain[:x].sort.must_equal [1,2,3]
     s.domain[:y].sort.must_equal [1,2,3]
   end
+
+  it "should not be solvable when it contains a non-solvable constraint" do
+    s = Seelpe::ConstraintSet.new
+    s << "x>0" << "y>0" << "x+y<5"
+    s.def_domain( x: -10..10, y: -10..10 )
+    s.satisfiable?.must_equal true
+
+    s << "1==0"
+    s.def_domain( x: -10..10, y: -10..10 )
+    s.satisfiable?.must_equal false
+  end
 end

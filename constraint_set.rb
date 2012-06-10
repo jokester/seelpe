@@ -36,11 +36,6 @@ module Seelpe
       end
     end
 
-    def satisfiable?
-      raise "domain not defined for #{unrestricted_variable.join','}" unless domain_sufficent?
-      back_solve Hash.new,@constraints
-    end
-
     def reduce_domain &logger
       # reduce domain for each constraint, until all of them are partial_solvable
       @constraints.sort_by! {|c| c.vars.size }
@@ -74,12 +69,17 @@ module Seelpe
       # return whether domain was reduced by the constraint
       raise "all domain must be defined before reduce" unless domain_sufficent?
       changed=false
+      if constraint.vars.size==0 and constraint.eval != true
+        @domain.keys.each {|k| @domain[k] = [] }
+      end
       constraint.vars.each do |var|
         # reduce D(var), leave only values such that { var => value } is a partial solution
         new_domain = @domain[var].select {|value| constraint.substitute(var=>value).satisfiable? @domain}
         if (new_domain.size < @domain[var].size)
-          yield "D(#{var}) has been reduced to #{new_domain}\n" if block_given?
-          yield "  once was #{@domain[var]}\n" if block_given?
+          if block_given?
+            yield "D(#{var}) has been reduced to #{new_domain}\n"
+            yield "  once was #{@domain[var]}\n"
+          end
           @domain[var] = new_domain 
           changed=true
         end
