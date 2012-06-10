@@ -46,15 +46,17 @@ seelpe is a ruby module to solve constraint problems on finite domain
         d = a.substitute( x1:5, x2:3 )
         d.eval # => false
 
-## To build a constraint set, simply `ConstraintSet.new`, and feed it with constriants
+## To build a constraint set
 
-* A constraint set is actually a horn clause.
+###simply `ConstraintSet.new`, and feed it with constriants
 
         s = Seelpe::ConstraintSet.new
         s << "x + y == 16" << "2*x + 4*y == 44"
         # x => num of cranes
         # y => num of tortoises
         # 16 heads and 44 legs in total
+
+* A constraint set is actually a horn clause.
 
 * It can be used to reduce a set of domains, and determine if any solution exists on the domain
 
