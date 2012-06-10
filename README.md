@@ -2,7 +2,7 @@
 seelpe is a ruby module to solve constraint problems on finite domain
 
 # Example
-### To build a constraint, one can either
+## To build a constraint, one can either
 
 * build a instance by list of arguments, and a proc
 
@@ -24,7 +24,7 @@ seelpe is a ruby module to solve constraint problems on finite domain
 
 ### With a constraint, one can
 
-    a = Constraint.parse "x1 < x2"
+        a = Constraint.parse "x1 < x2"
 
 * check its variable
 
@@ -45,3 +45,47 @@ seelpe is a ruby module to solve constraint problems on finite domain
 
         d = a.substitute( x1:5, x2:3 )
         d.eval # => false
+
+## To build a constraint set, simply `ConstraintSet.new`, and feed it with constriants
+
+* A constraint set is actually a horn clause.
+
+        s = Seelpe::ConstraintSet.new
+        s << "x + y == 16" << "2*x + 4*y == 44"
+        # x => num of cranes
+        # y => num of tortoises
+        # 16 heads and 44 legs in total
+
+* It can be used to reduce a set of domains, and determine if any solution exists on the domain
+
+        s.def_domain(:x => 0..10,
+                     :y => 0..10)
+
+        s.reduce_domain {|line| print line} # log string will be yielded, if a block is given
+        # =>
+        # D(x) has been reduced to [6, 7, 8, 9, 10]
+        #   once was [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        # D(y) has been reduced to [6, 7, 8, 9, 10]
+        #   once was [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        # D(x) has been reduced to [6, 8, 10]
+        #   once was [6, 7, 8, 9, 10]
+        # D(y) has been reduced to [6, 7, 8]
+        #   once was [6, 7, 8, 9, 10]
+        # D(x) has been reduced to [8, 10]
+        #   once was [6, 8, 10]
+        # D(y) has been reduced to [6, 8]
+        #   once was [6, 7, 8]
+        # D(x) has been reduced to [10]
+        #   once was [8, 10]
+        # D(y) has been reduced to [6]
+        #   once was [6, 8]
+
+	print s.satisfiable?,"\n"
+        # => true
+
+        s.def_domain(:x => 0..5,
+                     :y => 0..3)
+        
+        print s.satisfiable?,"\n"
+        # => false
+
