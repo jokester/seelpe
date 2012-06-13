@@ -1,4 +1,3 @@
-
 module Seelpe
   class ConstraintSet
     def initialize logger=nil
@@ -14,7 +13,7 @@ module Seelpe
       when Constraint
         @constraints << new_constraint
       when String
-        @constraints << Constraint.parse(new_constraint)
+        new_constraint.split("AND").each {|i| @constraints << Constraint.parse(i) }
       else
         raise ArgumentError "Constraint or String expected"
       end
@@ -51,7 +50,14 @@ module Seelpe
     end
 
     def satisfiable?
-      0 < reduce_domain
+      case reduce_domain
+      when 0
+        false
+      when 1
+        true
+      else
+        :unknown
+      end
     end
 
     def space_size
